@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phishing Detective - Cybersecurity Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+            position: relative;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 4px;
+            background: linear-gradient(90deg, #ff6b6b, #4ecdc4, #45b7d1);
+            border-radius: 2px;
+            animation: headerGlow 2s ease-in-out infinite;
+        }
+
+        @keyframes headerGlow {
+            0%, 100% { opacity: 0.7; width: 100px; }
+            50% { opacity: 1; width: 200px; }
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 20px;
+        }
+
+        .game-stats {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            min-width: 150px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .email-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+            overflow: hidden;
+            margin-bottom: 30px;
+            transition: transform 0.3s ease;
+        }
+
+        .email-container:hover {
+            transform: translateY(-2px);
+        }
+
+        .email-header {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            padding: 20px;
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        .email-subject {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .email-meta {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            color: #666;
+        }
+
+        .email-meta div {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .email-meta span {
+            font-weight: 500;
+        }
+
+        .email-body {
+            padding: 30px;
+            line-height: 1.6;
+            font-size: 1.1rem;
+        }
+
+        .email-body p {
+            margin-bottom: 15px;
+        }
+
+        .email-link {
+            color: #007bff;
+            text-decoration: underline;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .email-link:hover {
+            color: #0056b3;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .action-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.3s ease, height 0.3s ease;
+        }
+
+        .action-btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .legitimate-btn {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+        }
+
+        .legitimate-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(40, 167, 69, 0.3);
+        }
+
+        .phishing-btn {
+            background: linear-gradient(135deg, #dc3545, #e83e8c);
+            color: white;
+        }
+
+        .phishing-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(220, 53, 69, 0.3);
+        }
+
+        .feedback {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border-left: 5px solid #667eea;
+            animation: feedbackSlide 0.5s ease-out;
+        }
+
+        @keyframes feedbackSlide {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .feedback.correct {
+            border-left-color: #28a745;
+            background: linear-gradient(135deg, #d4edda, #c3e6cb);
+        }
+
+        .feedback.incorrect {
+            border-left-color: #dc3545;
+            background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+        }
+
+        .feedback-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .feedback-content {
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+
+        .red-flags {
+            background: #fff3cd;
+            border: 2px solid #ffeaa7;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 15px;
+        }
+
+        .red-flags h4 {
+            color: #856404;
+            margin-bottom: 10px;
+        }
+
+        .red-flags ul {
+            color: #856404;
+            padding-left: 20px;
+        }
+
+        .red-flags li {
+            margin-bottom: 5px;
+        }
+
+        .next-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            display: block;
+            margin: 0 auto 30px;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .next-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .final-score {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+        }
+
+        .final-score h2 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+
+        .final-score .score {
+            font-size: 4rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .restart-btn {
+            background: white;
+            color: #667eea;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .restart-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(255, 255, 255, 0.3);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #28a745, #20c997);
+            border-radius: 4px;
+            transition: width 0.5s ease;
+            position: relative;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: progressShimmer 1.5s ease-in-out infinite;
+        }
+
+        @keyframes progressShimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .game-stats {
+                gap: 15px;
+            }
+            
+            .stat-card {
+                min-width: 120px;
+                padding: 15px;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .action-btn {
+                width: 100%;
+                max-width: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🕵️ Phishing Detective</h1>
+            <p class="subtitle">Can you spot the fake emails and protect yourself from cyber threats?</p>
+        </div>
+
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+
+        <div class="game-stats">
+            <div class="stat-card">
+                <div class="stat-number" id="currentQuestion">1</div>
+                <div class="stat-label">Question</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="correctAnswers">0</div>
+                <div class="stat-label">Correct</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="totalQuestions">10</div>
+                <div class="stat-label">Total</div>
+            </div>
+        </div>
+
+        <div id="gameContainer">
+            <div class="email-container">
+                <div class="email-header">
+                    <div class="email-subject" id="emailSubject"></div>
+                    <div class="email-meta">
+                        <div>📧 <span>From:</span> <span id="emailFrom"></span></div>
+                        <div>📅 <span>Date:</span> <span id="emailDate"></span></div>
+                        <div>🔒 <span>Security:</span> <span id="emailSecurity"></span></div>
+                    </div>
+                </div>
+                <div class="email-body" id="emailBody"></div>
+            </div>
+
+            <div class="action-buttons">
+                <button class="action-btn legitimate-btn" onclick="makeChoice(false)">
+                    ✅ Legitimate Email
+                </button>
+                <button class="action-btn phishing-btn" onclick="makeChoice(true)">
+                    🚨 Phishing Attempt
+                </button>
+            </div>
+
+            <div id="feedback" class="feedback hidden">
+                <div class="feedback-title" id="feedbackTitle"></div>
+                <div class="feedback-content" id="feedbackContent"></div>
+                <button class="next-btn" onclick="nextQuestion()">Next Email</button>
+            </div>
+        </div>
+
+        <div id="finalScore" class="final-score hidden">
+            <h2>🎉 Game Complete!</h2>
+            <div class="score" id="finalScoreText"></div>
+            <p id="finalMessage"></p>
+            <button class="restart-btn" onclick="restartGame()">Play Again</button>
+        </div>
+    </div>
+
+    <script>
+        const emails = [
+            {
+                subject: "Urgent: Your Account Will Be Suspended",
+                from: "security@amazom.com",
+                date: "Today, 2:34 PM",
+                security: "Not Encrypted",
+                body: "Dear Customer,<br><br>Your Amazon account has been flagged for suspicious activity. To avoid suspension, please verify your identity immediately by clicking the link below:<br><br><a href='#' class='email-link'>Verify Account Now</a><br><br>You have 24 hours to complete this process or your account will be permanently closed.<br><br>Amazon Security Team",
+                isPhishing: true,
+                explanation: "This is a phishing email designed to steal your credentials.",
+                redFlags: [
+                    "Misspelled domain: 'amazom.com' instead of 'amazon.com'",
+                    "Creates false urgency with '24 hours' deadline",
+                    "Generic greeting 'Dear Customer' instead of your name",
+                    "Threatening language about account suspension",
+                    "Suspicious link that doesn't go to official Amazon"
+                ]
+            },
+            {
+                subject: "Monthly Newsletter - Security Tips",
+                from: "newsletter@techcompany.com",
+                date: "Today, 10:15 AM",
+                security: "Encrypted",
+                body: "Hello John,<br><br>Welcome to our monthly cybersecurity newsletter! This month we're covering:<br><br>• How to create strong passwords<br>• Recognizing phishing attempts<br>• Setting up two-factor authentication<br><br>Visit our security blog for more tips: <a href='#' class='email-link'>www.techcompany.com/security</a><br><br>Best regards,<br>The Security Team",
+                isPhishing: false,
+                explanation: "This is a legitimate newsletter from a known company.",
+                redFlags: [
+                    "✅ Personal greeting with actual name",
+                    "✅ Legitimate domain name",
+                    "✅ Educational content, not urgent requests",
+                    "✅ Professional tone and formatting",
+                    "✅ No urgent calls to action"
+                ]
+            },
+            {
+                subject: "Congratulations! You've Won $1,000,000!",
+                from: "winner@lottery-international.net",
+                date: "Today, 4:22 PM",
+                security: "Not Encrypted",
+                body: "CONGRATULATIONS!!!<br><br>You have been selected as the winner of our International Lottery! You've won $1,000,000 USD!<br><br>To claim your prize, please send us:<br>• Your full name and address<br>• Copy of your ID<br>• Bank account details<br><br>Reply quickly as this offer expires in 48 hours!<br><br>Mr. Johnson Williams<br>International Lottery Commission",
+                isPhishing: true,
+                explanation: "This is a classic advance-fee fraud scam.",
+                redFlags: [
+                    "Too good to be true - unsolicited lottery win",
+                    "Requests personal and financial information",
+                    "Suspicious domain 'lottery-international.net'",
+                    "Creates false urgency with 48-hour deadline",
+                    "Generic sender name and organization"
+                ]
+            },
+            {
+                subject: "IT Department: System Maintenance Tonight",
+                from: "it-support@yourcompany.com",
+                date: "Today, 3:45 PM",
+                security: "Encrypted",
+                body: "Dear Team,<br><br>We will be performing scheduled system maintenance tonight from 11 PM to 2 AM. During this time, you may experience brief interruptions to email and file services.<br><br>No action is required from you. All services will be restored automatically.<br><br>If you have any questions, please contact the IT helpdesk at ext. 1234.<br><br>Best regards,<br>IT Support Team",
+                isPhishing: false,
+                explanation: "This is a legitimate IT maintenance notification.",
+                redFlags: [
+                    "✅ From company IT department",
+                    "✅ Informational only, no action required",
+                    "✅ Professional language and formatting",
+                    "✅ Provides contact information for questions",
+                    "✅ No suspicious links or attachments"
+                ]
+            },
+            {
+                subject: "Your PayPal Account Has Been Limited",
+                from: "service@paypal-security.com",
+                date: "Today, 1:18 PM",
+                security: "Not Encrypted",
+                body: "Dear PayPal User,<br><br>We have detected unusual activity on your PayPal account. For your security, we have temporarily limited your account access.<br><br>To restore full access, please log in and verify your information:<br><br><a href='#' class='email-link'>Log In to PayPal</a><br><br>Failure to verify within 72 hours will result in permanent account closure.<br><br>PayPal Security Department",
+                isPhishing: true,
+                explanation: "This is a phishing attempt mimicking PayPal.",
+                redFlags: [
+                    "Fake domain: 'paypal-security.com' instead of 'paypal.com'",
+                    "Generic greeting 'Dear PayPal User'",
+                    "Creates urgency with 72-hour deadline",
+                    "Threatening account closure",
+                    "Suspicious link that doesn't go to real PayPal"
+                ]
+            },
+            {
+                subject: "Meeting Confirmation - Tomorrow 2 PM",
+                from: "sarah.johnson@clientcompany.com",
+                date: "Today, 11:30 AM",
+                security: "Encrypted",
+                body: "Hi Mike,<br><br>Just confirming our meeting tomorrow at 2 PM in Conference Room B. We'll be discussing the Q3 project timeline and budget allocation.<br><br>Please bring the latest project reports and cost estimates.<br><br>Looking forward to our discussion!<br><br>Best regards,<br>Sarah Johnson<br>Project Manager<br>Client Company Inc.",
+                isPhishing: false,
+                explanation: "This is a legitimate business meeting confirmation.",
+                redFlags: [
+                    "✅ Personal greeting with actual name",
+                    "✅ Legitimate business domain",
+                    "✅ Specific meeting details and agenda",
+                    "✅ Professional signature with title",
+                    "✅ No urgent requests or suspicious links"
+                ]
+            },
+            {
+                subject: "URGENT: Verify Your Bank Account",
+                from: "alerts@secure-banking.org",
+                date: "Today, 5:10 PM",
+                security: "Not Encrypted",
+                body: "URGENT SECURITY ALERT<br><br>We have detected suspicious transactions on your bank account. To protect your funds, please verify your account immediately:<br><br>Account Number: ****7829<br>Last Transaction: $2,450.00<br><br><a href='#' class='email-link'>Verify Account Security</a><br><br>This verification must be completed within 2 hours or your account will be frozen.<br><br>Customer Security Team",
+                isPhishing: true,
+                explanation: "This is a phishing scam targeting banking credentials.",
+                redFlags: [
+                    "Fake domain: 'secure-banking.org' not a real bank",
+                    "Creates extreme urgency with 2-hour deadline",
+                    "Vague 'suspicious transactions' without specifics",
+                    "Generic sender 'Customer Security Team'",
+                    "Threatening to freeze account"
+                ]
+            },
+            {
+                subject: "Weekly Project Status Report",
+                from: "admin@projectmanagement.yourcompany.com",
+                date: "Today, 9:00 AM",
+                security: "Encrypted",
+                body: "Good morning team,<br><br>Here's this week's project status summary:<br><br>• Project Alpha: 85% complete, on track<br>• Project Beta: 60% complete, minor delays<br>• Project Gamma: 30% complete, on schedule<br><br>Detailed reports are available on the project dashboard. Please review and provide updates by Friday.<br><br>Best regards,<br>Project Management Office",
+                isPhishing: false,
+                explanation: "This is a legitimate internal project status report.",
+                redFlags: [
+                    "✅ From internal company project management",
+                    "✅ Contains specific project information",
+                    "✅ Professional business communication",
+                    "✅ No urgent requests or suspicious links",
+                    "✅ Encrypted email from company domain"
+                ]
+            },
+            {
+                subject: "Re: Your Recent Purchase - Refund Available",
+                from: "refunds@customer-service.net",
+                date: "Today, 12:45 PM",
+                security: "Not Encrypted",
+                body: "Dear Valued Customer,<br><br>We noticed you recently made a purchase but may be eligible for a refund due to a pricing error on our website.<br><br>To process your refund of $89.99, please confirm your payment details:<br><br><a href='#' class='email-link'>Claim Your Refund</a><br><br>This refund offer is only valid for 24 hours.<br><br>Customer Service Team",
+                isPhishing: true,
+                explanation: "This is a phishing scam offering fake refunds.",
+                redFlags: [
+                    "Generic domain 'customer-service.net' not specific company",
+                    "Unsolicited refund offer for unspecified purchase",
+                    "Requests payment details for a 'refund'",
+                    "Creates urgency with 24-hour deadline",
+                    "Vague about what purchase or company"
+                ]
+            },
+            {
+                subject: "Team Building Event - Save the Date",
+                from: "hr@yourcompany.com",
+                date: "Today, 2:15 PM",
+                security: "Encrypted",
+                body: "Dear Team,<br><br>We're excited to announce our upcoming team building event!<br><br>Date: Friday, March 15th<br>Time: 2:00 PM - 6:00 PM<br>Location: Riverside Park Pavilion<br>Activities: BBQ, games, and team challenges<br><br>Please RSVP by March 10th so we can plan accordingly. Looking forward to a fun afternoon together!<br><br>Best regards,<br>Human Resources<br>Your Company Inc.",
+                isPhishing: false,
+                explanation: "This is a legitimate HR announcement about a company event.",
+                redFlags: [
+                    "✅ From official company HR department",
+                    "✅ Specific event details and location",
+                    "✅ Professional company communication",
+                    "✅ Reasonable RSVP deadline",
+                    "✅ No suspicious links or urgent requests"
+                ]
+            }
+        ];
+
+        let currentEmailIndex = 0;
+        let correctAnswers = 0;
+        let gameStarted = false;
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        function startGame() {
+            shuffleArray(emails);
+            currentEmailIndex = 0;
+            correctAnswers = 0;
+            gameStarted = true;
+            document.getElementById('finalScore').classList.add('hidden');
+            document.getElementById('gameContainer').classList.remove('hidden');
+            loadCurrentEmail();
+            updateStats();
+        }
+
+        function loadCurrentEmail() {
+            const email = emails[currentEmailIndex];
+            
+            document.getElementById('emailSubject').textContent = email.subject;
+            document.getElementById('emailFrom').textContent = email.from;
+            document.getElementById('emailDate').textContent = email.date;
+            document.getElementById('emailSecurity').textContent = email.security;
+            document.getElementById('emailBody').innerHTML = email.body;
+            
+            document.getElementById('feedback').classList.add('hidden');
+            document.querySelector('.action-buttons').style.display = 'flex';
+            
+            updateProgress();
+        }
+
+        function makeChoice(isPhishing) {
+            const email = emails[currentEmailIndex];
+            const feedback = document.getElementById('feedback');
+            const feedbackTitle = document.getElementById('feedbackTitle');
+            const feedbackContent = document.getElementById('feedbackContent');
+            
+            const isCorrect = isPhishing === email.isPhishing;
+            
+            if (isCorrect) {
+                correctAnswers++;
+                feedback.className = 'feedback correct';
+                feedbackTitle.innerHTML = '✅ Correct!';
+            } else {
+                feedback.className = 'feedback incorrect';
+                feedbackTitle.innerHTML = '❌ Incorrect';
+            }
+            
+            let redFlagsHtml = '';
+            if (email.isPhishing) {
+                redFlagsHtml = `
+                    <div class="red-flags">
+                        <h4>🚩 Red Flags to Watch For:</h4>
+                        <ul>
+                            ${email.redFlags.map(flag => `<li>${flag}</li>`).join('')}
+                        </ul>
+                    </div>
+                `;
+            } else {
+                redFlagsHtml = `
+                    <div class="red-flags">
+                        <h4>✅ Signs This Email is Legitimate:</h4>
+                        <ul>
+                            ${email.redFlags.map(flag => `<li>${flag}</li>`).join('')}
+                        </ul>
+                    </div>
+                `;
+            }
+            
+            feedbackContent.innerHTML = `
+                <p><strong>Explanation:</strong> ${email.explanation}</p>
+                ${redFlagsHtml}
+            `;
+            
+            feedback.classList.remove('hidden');
+            document.querySelector('.action-buttons').style.display = 'none';
+            
+            updateStats();
+        }
+
+        function nextQuestion() {
+            currentEmailIndex++;
+            
+            if (currentEmailIndex >= emails.length) {
+                showFinalScore();
+            } else {
+                loadCurrentEmail();
+            }
+        }
+
+        function updateStats() {
+            document.getElementById('currentQuestion').textContent = currentEmailIndex + 1;
+            document.getElementById('correctAnswers').textContent = correctAnswers;
+            document.getElementById('totalQuestions').textContent = emails.length;
+        }
+
+        function updateProgress() {
+            const progress = ((currentEmailIndex + 1) / emails.length) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+        }
+
+        function showFinalScore() {
+            document.getElementById('gameContainer').classList.add('hidden');
+            document.getElementById('finalScore').classList.remove('hidden');
+            
+            const percentage = Math.round((correctAnswers / emails.length) * 100);
+            document.getElementById('finalScoreText').textContent = `${correctAnswers}/${emails.length} (${percentage}%)`;
+            
+            let message = '';
+            if (percentage >= 90) {
+                message = "🎉 Excellent! You're a phishing detection expert!";
+            } else if (percentage >= 70) {
+                message = "👍 Good job! You can spot most phishing attempts.";
+            } else if (percentage >= 50) {
+                message = "⚠️ Not bad, but keep practicing to improve your skills.";
+            } else {
+                message = "🚨 You need more practice! Be more careful with suspicious emails.";
+            }
+            
+            document.getElementById('finalMessage').textContent = message;
+        }
+
+        function restartGame() {
+            startGame();
+        }
+
+        // Start the game when the page loads
+        window.onload = function() {
+            startGame();
+        };
+    </script>
+</body>
+</html>
